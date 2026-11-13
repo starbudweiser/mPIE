@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>mPIE · maquettes Socle</title>
+<style>
+:root,[data-theme="dark"]{color-scheme:dark;--bg:#1e1e1e;--bg-sunken:#181818;--surface:#222;--surface-raised:#262626;--surface-hover:#2c2c2c;--surface-selected:#303030;--control:#333;--control-hover:#404040;--border:#333;--border-strong:#444;--border-control:#707070;--text-strong:#fff;--text:#ddd;--text-muted:#aaa;--text-subtle:#8f8f8f;--accent:#0ea5e9;--accent-fill:#0369a1;--on-accent-fill:#fff;--accent-text:#38bdf8;--action:#fbbf24;--on-action:#1a1a1a;--success:#4ade80;--warning:#fbbf24;--warning-bg:#3f2a0c;--warning-border:#f59e0b;--warning-soft:#fde68a;--danger:#f87171;--desk:#131416;--brand:#fb7185}
+[data-theme="light"]{color-scheme:light;--bg:#f2f2f2;--bg-sunken:#ebebeb;--surface:#fff;--surface-raised:#fafafa;--surface-hover:#f0f0f0;--surface-selected:#e8e8e8;--control:#e6e6e6;--control-hover:#d9d9d9;--border:#d4d4d4;--border-strong:#bdbdbd;--border-control:#8a8a8a;--text-strong:#111;--text:#222;--text-muted:#555;--text-subtle:#666;--accent:#0284c7;--accent-fill:#0369a1;--on-accent-fill:#fff;--accent-text:#0369a1;--action:#fbbf24;--on-action:#1a1a1a;--success:#15803d;--warning:#b45309;--warning-bg:#fef3c7;--warning-border:#d97706;--warning-soft:#78350f;--danger:#b91c1c;--desk:#d9dce1;--brand:#e11d48}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:13px/1.45 -apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif}
+.top{display:flex;align-items:center;gap:16px;padding:14px 28px;background:var(--surface-raised);border-bottom:1px solid var(--border)}
+.top h1{margin:0;font-size:20px;letter-spacing:.025em;color:var(--text-strong)}
+.top p{margin:0;color:var(--text-muted);flex:1}
+.m{color:var(--brand)}
+.btn{min-height:32px;padding:0 14px;border:0;border-radius:4px;background:var(--control);color:var(--text);font:inherit;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background .15s}
+.btn:hover{background:var(--control-hover)}
+.btn.pri{background:var(--accent-fill);color:var(--on-accent-fill);letter-spacing:.05em}
+.btn.act{background:var(--action);color:var(--on-action);letter-spacing:.05em}
+.wrap{padding:28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(480px,1fr));gap:28px;max-width:1500px;margin:0 auto}
+.board{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:24px;display:flex;flex-direction:column;gap:12px}
+.board.wide{grid-column:1/-1}
+.board h2{margin:0;font-size:15px;letter-spacing:.025em;color:var(--text-strong)}
+.board h2 .n{color:var(--accent-text);font-family:ui-monospace,Menlo,monospace;margin-right:8px}
+.cap{margin:0;color:var(--text-muted)}
+.cap b{color:var(--text)}
+.stage{background:var(--desk);border-radius:8px;padding:18px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:12px;flex:1}
+.stage svg{width:100%;max-width:400px;height:auto;display:block}
+svg text{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",sans-serif}
+.modes{display:flex;gap:2px;background:var(--bg-sunken);padding:2px;border-radius:4px}
+.modes span{display:flex;align-items:center;gap:6px;min-height:28px;padding:0 12px;border-radius:3px;color:var(--text-muted);font-size:12px}
+.modes span i{font:600 11px ui-monospace,Menlo,monospace;color:var(--text-subtle);font-style:normal}
+.modes span.on{background:var(--accent-fill);color:var(--on-accent-fill)}
+.modes span.on i{color:var(--on-accent-fill);opacity:.8}
+.hint{color:var(--text-subtle);font-size:12px;text-align:center}
+.kc{display:inline-flex;align-items:center;min-height:20px;padding:0 6px;border-radius:3px;background:var(--control);color:var(--text);font:600 11px ui-monospace,Menlo,monospace}
+.now{width:100%;max-width:340px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:10px 12px}
+.now b{display:block;color:var(--text-strong)}.now span{color:var(--text-muted);font-size:12px}
+.bar{height:2px;background:var(--control);margin-top:8px}.bar i{display:block;height:2px;width:38%;background:var(--accent)}
+.win{border:1px solid var(--border-strong);border-radius:10px;overflow:hidden;background:var(--bg);margin:0 auto;width:100%}
+.win .tb{height:32px;background:var(--surface-raised);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:center;position:relative;color:var(--text-muted);font-size:13px;font-weight:600}
+.win .tb s{position:absolute;left:12px;display:flex;gap:7px;text-decoration:none}
+.win .tb s i{width:11px;height:11px;border-radius:50%;background:var(--control-hover)}
+.tabs{display:flex;gap:2px;margin:12px 16px;background:var(--bg-sunken);padding:2px;border-radius:4px}
+.tabs span{flex:1;text-align:center;min-height:28px;line-height:28px;border-radius:3px;color:var(--text-muted);font-size:12px;white-space:nowrap}
+.tabs span.on{background:var(--accent-fill);color:var(--on-accent-fill)}
+.body{padding:0 16px 16px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+.sec h4{margin:0 0 8px;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--text-muted);font-weight:700}
+.sec .card{background:var(--surface);border:1px solid var(--border);padding:12px;display:flex;flex-direction:column;gap:12px}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:32px}
+.row label{color:var(--text)}
+.field{background:var(--bg-sunken);color:var(--accent-text);min-height:32px;padding:0 12px;display:inline-flex;align-items:center;min-width:130px;justify-content:space-between;gap:8px;white-space:nowrap}
+.seg{display:inline-flex;gap:2px;background:var(--bg-sunken);padding:2px;border-radius:4px}
+.seg span{padding:0 10px;min-height:26px;line-height:26px;font-size:12px;color:var(--text-muted)}
+.seg span.on{background:var(--accent-fill);color:var(--on-accent-fill);border-radius:3px}
+.chk{display:flex;align-items:center;gap:8px;min-height:24px}
+.chk i{width:14px;height:14px;border:1px solid var(--border-control);border-radius:3px;display:inline-grid;place-items:center;flex:none}
+.chk.on i{background:var(--accent-fill);border-color:var(--accent-fill)}
+.chk.on i:after{content:"";width:6px;height:3px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(-45deg) translate(1px,-1px)}
+.sub{color:var(--accent-text);font-size:12px;margin:-6px 0 0}
+.meta{color:var(--text-muted);font-size:12px}
+.slider{flex:1;min-width:70px;max-width:150px;height:4px;background:var(--control);position:relative}.slider i{position:absolute;left:0;top:0;height:4px;background:var(--accent)}.slider b{position:absolute;top:-5px;width:14px;height:14px;border-radius:50%;background:var(--accent)}
+.tile{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none}
+.items{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;padding:0 16px 16px}
+.it{background:var(--surface);border:1px solid var(--border);padding:12px;display:flex;align-items:center;gap:12px;min-width:0}
+.it div{min-width:0;flex:1}.it b{display:block;color:var(--text-strong);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600}
+.it span{color:var(--text-muted);font-size:12px}
+.it.add{border:1px dashed var(--border-control);background:transparent;color:var(--accent-text);justify-content:center;font-weight:600}
+.x{color:var(--text-subtle);font-size:16px;line-height:1}
+.bar-top{display:flex;justify-content:center;align-items:flex-start;gap:36px;flex-wrap:wrap;width:100%}
+.menubar{width:100%;max-width:420px;height:28px;background:var(--surface-raised);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:flex-end;gap:14px;padding:0 12px;color:var(--text);font-size:13px}
+.menubar .sel{background:var(--control-hover);border-radius:4px;padding:3px 6px;display:inline-flex}
+.menu{width:292px;background:var(--surface-raised);border:1px solid var(--border-strong);border-radius:8px;padding:5px;margin-left:auto;margin-top:2px}
+.menu div{display:flex;justify-content:space-between;align-items:center;min-height:26px;padding:0 10px;border-radius:5px;color:var(--text);font-size:13px}
+.menu div.hl{background:var(--accent-fill);color:#fff}
+.menu div em{font-style:normal;color:var(--text-subtle);font-size:12px}.menu div.hl em{color:#fff;opacity:.85}
+.menu hr{border:0;border-top:1px solid var(--border);margin:5px 6px}
+.menu p{margin:4px 10px 2px;font-size:11px;font-weight:700;color:var(--text-subtle)}
+.menu div.ck,.menu div.ind{position:relative;padding-left:26px}
+.menu div.ck:before{content:"✓";position:absolute;left:9px;color:var(--text-muted)}
+.welcome svg{width:84px;height:84px;flex:none}
+.stage .menubar svg{width:18px;height:18px}
+.callout{background:var(--surface-raised);border:1px solid var(--warning-border);padding:10px 12px;display:flex;gap:10px;align-items:flex-start}
+.callout b{color:var(--warning)}
+.welcome{max-width:520px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;display:flex;flex-direction:column;align-items:center;gap:14px;text-align:center}
+.welcome h3{margin:0;font-size:20px;letter-spacing:.025em;color:var(--text-strong)}
+.steps{width:100%;display:flex;flex-direction:column;gap:8px;text-align:left}
+.step{background:var(--surface-raised);border:1px solid var(--border);padding:10px 12px;display:flex;align-items:center;gap:12px}
+.step div{flex:1;min-width:0}.step b{display:block;color:var(--text-strong);font-weight:600}.step span{color:var(--text-muted);font-size:12px}
+.ok{color:var(--success);font-weight:600;font-size:12px}
+</style>
+</head>
+<body>
+<header class="top">
+  <svg width="36" height="36" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.7" fill="#e11d48"/><g fill="#fff"><path d="M50 50 L50 18 A32 32 0 0 1 82 50Z"/><path d="M50 50 L82 50 A32 32 0 0 1 50 82Z" opacity=".78"/><path d="M50 50 L50 82 A32 32 0 0 1 18 50Z"/><path d="M50 50 L18 50 A32 32 0 0 1 50 18Z" opacity=".78"/></g><circle cx="50" cy="50" r="9" fill="#e11d48"/></svg>
+  <div><h1><span class="m">m</span>PIE</h1></div>
+  <p>Clone personnel de Pieoneer · Socle standard (plat, sombre, dense) · 4 modules · icône de barre de menus monochrome</p>
+  <button class="btn" id="theme">Thème : sombre</button>
+</header>
+<main class="wrap" id="wrap"></main>
+
+<script>
+const NS='http://www.w3.org/2000/svg',C=200,R=176,r=66;
+const pol=(rad,deg)=>{const a=deg*Math.PI/180;return[C+rad*Math.cos(a),C+rad*Math.sin(a)]};
+function slice(n,i){const st=360/n,c=-90+i*st,a0=c-st/2,a1=c+st/2,[x0,y0]=pol(R,a0),[x1,y1]=pol(R,a1),[x2,y2]=pol(r,a1),[x3,y3]=pol(r,a0),l=st>180?1:0;
+return`M${x0} ${y0}A${R} ${R} 0 ${l} 1 ${x1} ${y1}L${x2} ${y2}A${r} ${r} 0 ${l} 0 ${x3} ${y3}Z`}
+const ICON={play:'<path d="M8 5v14l11-7z" fill="currentColor"/>',pause:'<path d="M7 5h3.2v14H7zM13.8 5H17v14h-3.2z" fill="currentColor"/>',
+prev:'<path d="M6.5 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M19 5.5L9 12l10 6.5z" fill="currentColor"/>',
+next:'<path d="M17.5 5v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M5 5.5L15 12 5 18.5z" fill="currentColor"/>',
+shuffle:'<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h3c4 0 5 10 10 10h4M3 17h3c1.5 0 2.6-1 3.6-2.4M14.4 9.4C15.4 8 16.5 7 18 7h2"/><path d="M17.5 4l3 3-3 3M17.5 14l3 3-3 3"/></g>',
+repeat:'<g fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V9a3 3 0 013-3h13M17 3l3 3-3 3M20 13v2a3 3 0 01-3 3H4M7 21l-3-3 3-3"/></g>'};
+function pie({items,hover,center,sub,mode}){
+ let s=`<svg viewBox="0 0 400 400" role="img" aria-label="Menu circulaire mPIE">`;
+ s+=`<circle cx="${C}" cy="${C}" r="${R+3}" fill="none" stroke="var(--border-strong)"/>`;
+ items.forEach((it,i)=>{const on=i===hover;
+  s+=`<path d="${slice(items.length,i)}" fill="${on?'var(--accent-fill)':'var(--surface-raised)'}" stroke="var(--desk)" stroke-width="3"/>`;
+  const [x,y]=pol((R+r)/2,-90+i*360/items.length);
+  if(mode==='tile'){
+   s+=`<g transform="translate(${x-19} ${y-19})"><rect width="38" height="38" rx="10" fill="${it.c}"/><text x="19" y="25" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">${it.g}</text></g>`;
+   if(it.run)s+=`<circle cx="${x}" cy="${y+27}" r="2.6" fill="${on?'#fff':'var(--success)'}"/>`;
+   if(it.k==='dir')s+=`<g transform="translate(${x+9} ${y-24})"><circle cx="5" cy="5" r="6.5" fill="var(--surface-raised)"/><path d="M1.5 3.5h2.4l1 1h3.1v3.6h-6.5z" fill="var(--text-muted)"/></g>`;
+  }else if(mode==='ctl'){
+   s+=`<text x="${x}" y="${y-2}" text-anchor="middle" font-size="12" font-weight="600" fill="${on?'#fff':'var(--text)'}">${it.l}</text><text x="${x}" y="${y+14}" text-anchor="middle" font-size="11" font-family="ui-monospace,Menlo,monospace" fill="${on?'#fff':'var(--text-subtle)'}" opacity="${on?.85:1}">${it.k}</text>`;
+  }else{
+   s+=`<g transform="translate(${x-12} ${y-12})" color="${on?'#fff':'var(--text)'}"><svg width="24" height="24" viewBox="0 0 24 24">${ICON[it.i]}</svg></g>`;
+  }});
+ s+=`<circle cx="${C}" cy="${C}" r="${r-4}" fill="var(--surface)" stroke="var(--border-strong)"/>`;
+ if(center.tile)s+=`<g transform="translate(${C-19} ${C-34})"><rect width="38" height="38" rx="10" fill="${center.tile.c}"/><text x="19" y="25" text-anchor="middle" font-size="14" font-weight="700" fill="#fff">${center.tile.g}</text></g>`;
+ if(center.cover)s+=`<clipPath id="cv"><circle cx="${C}" cy="${C}" r="${r-12}"/></clipPath><g clip-path="url(#cv)"><rect x="${C-r}" y="${C-r}" width="${2*r}" height="${2*r}" fill="#7c3aed"/><rect x="${C-r}" y="${C}" width="${2*r}" height="${r}" fill="#be185d"/></g><circle cx="${C}" cy="${C}" r="9" fill="var(--surface)"/>`;
+ else{s+=`<text x="${C}" y="${center.tile?C+20:C-2}" text-anchor="middle" font-size="13" font-weight="700" letter-spacing=".3" fill="var(--text-strong)">${center.t}</text>`;
+ s+=`<text x="${C}" y="${center.tile?C+36:C+16}" text-anchor="middle" font-size="11" fill="var(--text-muted)">${center.sub}</text>`;}
+ return s+'</svg>'}
+const MODES=['Lanceur','Applis ouvertes','Contrôleur','Musique'];
+const modes=on=>`<div class="modes">${MODES.map((m,i)=>`<span class="${i===on?'on':''}"><i>${i+1}</i>${m}</span>`).join('')}</div>`;
+const hint=`<div class="hint"><span class="kc">⇥</span> ou molette : changer de module · relâchez pour valider · <span class="kc">⎋</span> ferme</div>`;
+const board=(n,t,cap,body,wide)=>`<section class="board${wide?' wide':''}"><h2><span class="n">${n}</span>${t}</h2><p class="cap">${cap}</p>${body}</section>`;
+const stage=(inner)=>`<div class="stage">${inner}</div>`;
+const launch=[['Sa','Safari','#0a84ff'],['Ma','Mail','#3b82f6'],['Me','Messages','#22c55e'],['Mu','Musique','#e11d48'],['No','Notes','#ca8a04'],['Ph','Photos','#db2777'],['Ca','Calendrier','#dc2626'],['Te','Terminal','#374151'],['Ré','Réglages','#6b7280'],['Do','Documents','#0ea5e9','dir']].map(([g,l,c,k])=>({g,l,c,k}));
+const run=[['Sa','Safari','#0a84ff'],['Xc','Xcode','#2563eb'],['Mu','Musique','#e11d48'],['Sl','Slack','#7c3aed'],['Fi','Figma','#111827'],['No','Notes','#ca8a04'],['Te','Terminal','#374151'],['Pr','Aperçu','#0891b2'],['Cl','Claude','#c2410c']].map(([g,l,c])=>({g,l,c,run:1}));
+const ctl=[['Vue en liste','⌘2'],['Aller à…','⇧⌘G'],['Téléchargements','⌥⌘L'],['Nouveau dossier','⇧⌘N'],['Vider la corbeille','⇧⌘⌫'],['Options','⌘J']].map(([l,k])=>({l,k}));
+const mus=['pause','next','repeat','shuffle','prev'].map(i=>({i}));
+const W=document.getElementById('wrap');
+const settingsGeneral=`<div class="win"><div class="tb"><s><i></i><i></i><i></i></s>Réglages</div>
+<div class="tabs"><span>Général</span><span class="on">Déclenchement</span><span>Lanceur</span><span>Contrôleur</span><span>Musique</span><span>Mises à jour</span></div>
+<div class="body">
+<div class="sec"><h4>Raccourci clavier</h4><div class="card"><div class="row"><label>Ouvrir le menu</label><span class="field"><span>⌥ ␣</span><span class="meta">Modifier</span></span></div>
+<div class="row"><label>Mode</label><span class="seg"><span class="on">Maintenir</span><span>Appuyer</span></span></div><p class="sub">Maintenu : relâchez la touche pour valider la part visée.</p></div></div>
+<div class="sec"><h4>Souris</h4><div class="card"><div class="row"><label>Bouton</label><span class="field"><span>Bouton du milieu</span><span class="meta">⌄</span></span></div>
+<div class="row"><label>Modificateur</label><span class="field"><span>Aucun</span><span class="meta">⌄</span></span></div><p class="sub">Un clic long déclenche aussi le menu sous le pointeur.</p></div></div>
+<div class="sec"><h4>Modules</h4><div class="card"><div class="chk on"><i></i>Lanceur</div><div class="chk on"><i></i>Applis ouvertes</div><div class="chk on"><i></i>Contrôleur</div><div class="chk on"><i></i>Musique</div>
+<div class="row"><label>Module au premier appui</label><span class="field"><span>Dernier utilisé</span><span class="meta">⌄</span></span></div></div></div>
+<div class="sec"><h4>Apparence du menu</h4><div class="card"><div class="row"><label>Taille</label><span class="slider"><i style="width:62%"></i><b style="left:calc(62% - 7px)"></b></span><span class="field" style="min-width:64px;justify-content:center">100 %</span></div>
+<div class="chk on"><i></i>Ouvrir sous le pointeur</div><div class="chk on"><i></i>Afficher le nom au centre</div><div class="chk"><i></i>Son discret à la sélection</div></div></div>
+</div></div>`;
+const settingsLauncher=`<div class="win"><div class="tb"><s><i></i><i></i><i></i></s>Réglages</div>
+<div class="tabs"><span>Général</span><span>Déclenchement</span><span class="on">Lanceur</span><span>Contrôleur</span><span>Musique</span><span>Mises à jour</span></div>
+<div style="padding:0 16px 12px;display:flex;align-items:center;justify-content:space-between;gap:12px"><p class="sub" style="margin:0">Glissez des applis, dossiers ou fichiers ici. Ordre = sens horaire depuis le haut.</p><button class="btn pri">AJOUTER…</button></div>
+<div class="items">${launch.map(a=>`<div class="it"><span class="tile" style="background:${a.c}">${a.g}</span><div><b>${a.l}</b><span>${a.k==='dir'?'Dossier':'Application'}</span></div><span class="x">✕</span></div>`).join('')}<div class="it add">+ Ajouter un élément</div></div></div>`;
+const menuBoard=`<div class="stage"><div class="menubar"><span>Wi-Fi</span><span class="sel"><svg width="18" height="18" viewBox="0 0 18 18" aria-label="mPIE"><g fill="currentColor"><path d="M9 9V2.3A6.7 6.7 0 0 1 15.7 9Z"/><path d="M9 9h6.7A6.7 6.7 0 0 1 9 15.7Z" opacity=".55"/><path d="M9 9v6.7A6.7 6.7 0 0 1 2.3 9Z"/><path d="M9 9H2.3A6.7 6.7 0 0 1 9 2.3Z" opacity=".55"/></g><circle cx="9" cy="9" r="2.2" fill="var(--surface-raised)"/></svg></span><span>14:32</span></div>
+<div class="menu"><div class="hl">Ouvrir le menu circulaire <em>⌥ ␣</em></div><hr><p>Module</p><div class="ck">Lanceur <em>⌃1</em></div><div class="ind">Applis ouvertes <em>⌃2</em></div><div class="ind">Contrôleur <em>⌃3</em></div><div class="ind">Musique <em>⌃4</em></div><hr><div>Réglages… <em>⌘,</em></div><div>Rechercher une mise à jour…</div><div>À propos de mPIE</div><hr><div>Quitter mPIE <em>⌘Q</em></div></div>
+<div class="hint">Icône monochrome (modèle) : suit le thème de la barre. Menu ouvert sous l'icône, sans couleur dans le nom.</div></div>`;
+const welcome=`<div class="stage" style="justify-content:center"><div class="welcome"><svg width="84" height="84" viewBox="0 0 100 100" aria-hidden="true"><rect width="100" height="100" rx="22.7" fill="#e11d48"/><g fill="#fff"><path d="M50 50 L50 18 A32 32 0 0 1 82 50Z"/><path d="M50 50 L82 50 A32 32 0 0 1 50 82Z" opacity=".78"/><path d="M50 50 L50 82 A32 32 0 0 1 18 50Z"/><path d="M50 50 L18 50 A32 32 0 0 1 50 18Z" opacity=".78"/></g><circle cx="50" cy="50" r="9" fill="#e11d48"/></svg>
+<h3>Bienvenue dans <span class="m">m</span>PIE</h3><p class="cap" style="max-width:380px">Deux autorisations rendent le menu complet. Rien ne quitte votre Mac et aucun fichier n'est modifié.</p>
+<div class="steps"><div class="step"><div><b>Accessibilité</b><span>Pour le Contrôleur : simuler les raccourcis des autres applis.</span></div><button class="btn">Autoriser</button></div>
+<div class="step"><div><b>Automatisation de Musique et Spotify</b><span>Pour la télécommande : lecture, titre et pochette.</span></div><span class="ok">✓ Autorisé</span></div></div>
+<p class="meta">Appuyez sur <span class="kc">⌥ ␣</span> pour essayer le menu.</p><button class="btn act">COMMENCER</button></div></div>`;
+W.innerHTML=
+board('01','Lanceur','Vos applis, dossiers et fichiers en cercle. La part visée s’allume en <b>accent</b> et son nom s’affiche au centre ; le dossier porte une pastille.',stage(pie({items:launch,hover:4,center:{t:'Notes',sub:'Application · ⏎'},mode:'tile'})+modes(0)+hint))+
+board('02','Applis ouvertes','Passe à une appli qui tourne (point vert). Les applis exclues dans les réglages, comme le Finder, n’apparaissent pas.',stage(pie({items:run,hover:0,center:{t:'Safari',sub:'3 fenêtres'},mode:'tile'})+modes(1)+hint))+
+board('03','Contrôleur','Les raccourcis de l’appli au premier plan, sans la gymnastique des doigts. Le menu suit l’appli active ; chaque part envoie son raccourci.',stage(pie({items:ctl,hover:1,center:{tile:{g:'Fi',c:'#3b82f6'},t:'Finder',sub:'6 actions'},mode:'ctl'})+modes(2)+hint))+
+board('04','Musique','Lecture, titres, aléatoire et répétition d’Apple Musique ou de Spotify. La pochette occupe le centre.',stage(pie({items:mus,hover:0,center:{cover:1},mode:'ico'})+`<div class="now"><b>Marée basse</b><span>Atelier Nuit · Apple Musique</span><div class="bar"><i></i></div></div>`+modes(3)+hint))+
+board('05','Réglages · Déclenchement','Fenêtre à angles droits, champs sur <b>bg-sunken</b> sans contour, un titre de bloc en capitales discrètes, sous-titres en <b>accent-text</b>. Les blocs se rangent en grille adaptative.',settingsGeneral,true)+
+board('06','Réglages · Lanceur','Une carte par élément dans la grille adaptative (jamais une longue liste à moitié vide). Un seul bouton principal : AJOUTER.',settingsLauncher,true)+
+board('07','Menu de la barre de menus','Silhouette monochrome qui suit le thème. Clic gauche : ouvre le menu circulaire ; clic droit : ce menu, placé sous l’icône.',menuBoard)+
+board('08','Premier lancement','Assistant d’autorisations : un seul appel principal (ambre), rien de caché sur ce qui est lu ou modifié.',welcome);
+const t=document.getElementById('theme');t.onclick=()=>{const h=document.documentElement,d=h.dataset.theme==='dark';h.dataset.theme=d?'light':'dark';t.textContent='Thème : '+(d?'clair':'sombre')};
+</script>
+</body>
+</html>
