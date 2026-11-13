@@ -449,7 +449,6 @@ struct SettingsView: View {
                 .padding(Socle.M.space3).frame(maxWidth: .infinity, alignment: .leading)
                 .background(Socle.C.surface).overlay(Rectangle().stroke(Socle.C.border))
         }
-        .socleModule()
     }
 
     private func row<C: View>(_ key: String, @ViewBuilder _ control: () -> C) -> some View {
