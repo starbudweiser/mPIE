@@ -26,6 +26,12 @@ public struct PieLayout: Equatable, Sendable {
     /// Force de la loupe selon le nombre de parts : pleine à partir de `crowded`, proportionnelle en dessous.
     public static func strength(count n: Int) -> Double { min(1, Double(n) / crowded) }
 
+    /// Échelle d'une icône dans la loupe : ≈ 1,15 pour 8 applis, 1,45 à partir de 14 (relevé sur Pieoneer : l'effet ne se voit que serré).
+    public static func iconScale(count n: Int, pull: Double) -> Double {
+        let s = strength(count: n)
+        return 1 + 0.45 * s * s * pull
+    }
+
     /// `focus` : indice visé, fractionnaire pendant le déplacement (il peut dépasser `count`, il est ramené dans le cercle).
     /// `magnify` : 0 (cercle régulier) à 1 (loupe complète).
     public static func make(count n: Int, focus: Double, magnify: Double) -> PieLayout {

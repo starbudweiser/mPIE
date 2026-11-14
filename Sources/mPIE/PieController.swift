@@ -57,7 +57,8 @@ final class PieController: NSObject {
         model.scale = CGFloat(prefs.pieScale)
         model.showName = prefs.showName
         model.animated = prefs.animationsActive
-        model.appeared = !model.animated
+        model.iris = model.animated ? 0 : 1
+        model.revealTime = model.animated ? 0 : 99
         model.holdStyle = prefs.style == .hold && source != .menu
         model.hover = nil
         target = AppTracker.shared.lastExternal
@@ -78,9 +79,26 @@ final class PieController: NSObject {
         panel.makeKey()
         startTracking()
         if model.animated {
-            // Ouverture : le cercle grandit depuis son centre en apparaissant (ressort court, sans rebond marqué).
-            DispatchQueue.main.async { withAnimation(.spring(response: 0.22, dampingFraction: 0.82)) { PieController.shared.model.appeared = true } }
+            // Ouverture (relevée sur Pieoneer) : un anneau fin se resserre sur le centre pendant que les icônes se dévoilent une à une.
+            DispatchQueue.main.async { PieController.shared.playOpening() }
         }
+    }
+
+    /// Anneau qui se resserre (ressort court, sans rebond) et dévoilement des icônes dans le sens horaire (temps linéaire).
+    private func playOpening() {
+        let total = PieReveal.total(count: max(model.items.count, 1))
+        // Ease-out cubique sur 0,2 s après une image d'attente : le trou passe de 0,76 R à son rayon final en 5 images (relevé à 30 images/s).
+        withAnimation(.timingCurve(0.215, 0.61, 0.355, 1, duration: 0.2).delay(0.02)) { model.iris = 1 }
+        withAnimation(.linear(duration: total)) { model.revealTime = total }
+    }
+
+    /// Changement de module : l'anneau reste, les icônes se redévoilent.
+    private func replayReveal() {
+        guard model.animated, panel != nil else { return }
+        var transaction = Transaction(); transaction.disablesAnimations = true
+        withTransaction(transaction) { model.revealTime = 0 }
+        let total = PieReveal.total(count: max(model.items.count, 1))
+        DispatchQueue.main.async { withAnimation(.linear(duration: total)) { PieController.shared.model.revealTime = total } }
     }
 
     private func startModule() -> PieModule {
@@ -116,6 +134,7 @@ final class PieController: NSObject {
         case .controller: loadController()
         case .music: loadMusic()
         }
+        replayReveal()
         if let panel {
             // La carte des modules change de hauteur avec la télécommande : le centre du cercle reste en place.
             let metrics = PieMetrics(s: model.scale)
@@ -229,12 +248,13 @@ final class PieController: NSObject {
             let before = model.hover
             model.hover = index
             if model.module == .switcher { followFocus(index, before: before) }
+            else if model.module == .launcher, let index { model.focus = Double(index) }
             if index != nil, prefs.sound { NSSound(named: "Tink")?.play() }
         }
         updateTilt(dx: pointer.x - center.x, dy: pointer.y - center.y, outer: metrics.outer)
     }
 
-    private static let ringSpring = Animation.spring(response: 0.14, dampingFraction: 0.78)
+    private static let ringSpring = Animation.spring(response: 0.07, dampingFraction: 0.9)   // presque immédiat, comme l'original
 
     /// Sélecteur : la loupe et le surlignage suivent l'appli visée par un ressort court ; sans animations, le surlignage saute
     /// d'une appli à l'autre et le cercle reste régulier.

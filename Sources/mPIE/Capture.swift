@@ -42,7 +42,9 @@ enum Capture {
         controller.model.holdStyle = true
         controller.select(module)
         controller.model.animated = true
-        controller.model.appeared = true
+        controller.model.iris = Double(ProcessInfo.processInfo.environment["MPIE_IRIS"] ?? "") ?? 1
+        controller.model.revealTime = Double(ProcessInfo.processInfo.environment["MPIE_REVEAL"] ?? "") ?? 99
+        if module == .launcher { controller.model.focus = Double(hover ?? 0) }
         if module == .switcher { controller.model.focus = Double(hover ?? 0); controller.model.magnify = hover == nil ? 0 : 1 }
         if module == .controller { controller.model.tilt = CGSize(width: 0.8, height: -0.5) }
         if module == .music {

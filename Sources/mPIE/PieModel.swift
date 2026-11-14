@@ -22,6 +22,9 @@ struct PieMetrics {
     var outer: CGFloat { 176 * s }
     var inner: CGFloat { 66 * s }
     var tile: CGFloat { 38 * s }
+    /// Ouverture façon Pieoneer : un anneau fin plus grand de 7 % se resserre en couronne (le trou rétrécit de 0,82 R à r).
+    func rIn(_ iris: Double) -> CGFloat { inner + (outer * 0.82 - inner) * CGFloat(1 - iris) }
+    func rOut(_ iris: Double) -> CGFloat { outer * (1 + 0.07 * CGFloat(1 - iris)) }
     var mid: CGFloat { (outer + inner) / 2 }
     var side: CGFloat { 2 * (outer + 14) }
     var panelWidth: CGFloat { max(side, 500) }
@@ -47,7 +50,8 @@ final class PieModel: ObservableObject {
     @Published var accessibilityMissing = false
     // Animations (réglage « Animations de l'interface », coupées aussi si macOS demande de réduire les animations)
     @Published var animated = true
-    @Published var appeared = true         // ouverture : le cercle grandit et apparaît
+    @Published var iris: Double = 1        // ouverture : la couronne fine se referme sur le centre (0 = anneau fin, 1 = couronne finale)
+    @Published var revealTime: Double = 99 // ouverture : secondes écoulées pour le dévoilement des icônes (99 = terminé)
     @Published var focus: Double = 0       // Sélecteur : indice visé « déroulé » (animé d'une part à l'autre)
     @Published var magnify: Double = 0     // Sélecteur : 0 cercle régulier, 1 loupe complète
     @Published var tilt: CGSize = .zero    // Contrôleur : écart du pointeur au centre, de -1 à 1 (y vers le haut)
