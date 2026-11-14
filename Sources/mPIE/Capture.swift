@@ -41,6 +41,10 @@ enum Capture {
         controller.model.showName = true
         controller.model.holdStyle = true
         controller.select(module)
+        controller.model.animated = true
+        controller.model.appeared = true
+        if module == .switcher { controller.model.focus = Double(hover ?? 0); controller.model.magnify = hover == nil ? 0 : 1 }
+        if module == .controller { controller.model.tilt = CGSize(width: 0.8, height: -0.5) }
         if module == .music {
             let now = NowPlaying(player: .appleMusic, playing: true, title: "Marée basse", artist: "Atelier Nuit", shuffle: true, repeating: false)
             controller.model.now = now

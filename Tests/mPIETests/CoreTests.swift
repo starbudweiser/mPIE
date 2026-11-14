@@ -234,3 +234,53 @@ final class LocalizationTests: XCTestCase {
         for key in needed { XCTAssertNotNil(fr[key], "clé \(key) absente") }
     }
 }
+
+final class LayoutTests: XCTestCase {
+    func testRegularWhenNoMagnification() {
+        let layout = PieLayout.make(count: 10, focus: 3.4, magnify: 0)
+        XCTAssertEqual(layout.centers, (0..<10).map { Double($0) * 36 })
+        XCTAssertEqual(layout.widths, Array(repeating: 36, count: 10))
+    }
+
+    func testWidthsFillTheCircleAndFocusedSliceStaysPut() {
+        for focus in [0.0, 2.0, 4.5, 9.0, 12.0] {
+            let layout = PieLayout.make(count: 10, focus: focus, magnify: 1)
+            XCTAssertEqual(layout.widths.reduce(0, +), 360, accuracy: 1e-9)
+            let h = Int(focus.rounded()) % 10
+            XCTAssertEqual(layout.widths[h], layout.widths.max()!, accuracy: 1e-9)
+            if focus == focus.rounded() {
+                var delta = layout.centers[h] - Double(h) * 36
+                delta = (delta + 540).truncatingRemainder(dividingBy: 360) - 180
+                XCTAssertEqual(delta, 0, accuracy: 1e-9, "focus \(focus)")
+            }
+        }
+    }
+
+    func testFocusedSliceGrowsAndNeighboursShrink() {
+        let layout = PieLayout.make(count: 12, focus: 5, magnify: 1)
+        XCTAssertGreaterThan(layout.widths[5], 30)
+        XCTAssertLessThan(layout.widths[11], 30)
+        XCTAssertEqual(layout.pull[5], 1, accuracy: 1e-9)
+        XCTAssertLessThan(layout.pull[9], 0.01)
+    }
+
+    func testContinuousWhenFocusMoves() {
+        let a = PieLayout.make(count: 12, focus: 5.49, magnify: 1)
+        let b = PieLayout.make(count: 12, focus: 5.51, magnify: 1)
+        for i in 0..<12 { XCTAssertEqual(a.centers[i], b.centers[i], accuracy: 1.5) }
+    }
+
+    func testWrapsAroundTheRing() {
+        let a = PieLayout.make(count: 8, focus: 0, magnify: 1)
+        let b = PieLayout.make(count: 8, focus: 8, magnify: 1)
+        XCTAssertEqual(a, b)
+    }
+
+    func testConstantGapWidth() {
+        // L'écart entre deux parts a la même largeur au rayon intérieur et au rayon extérieur.
+        for radius in [66.0, 120.0, 176.0] {
+            let inset = PieGeometry.edgeInset(radius: radius, gap: 3) * .pi / 180
+            XCTAssertEqual(radius * sin(inset), 1.5, accuracy: 1e-9)
+        }
+    }
+}

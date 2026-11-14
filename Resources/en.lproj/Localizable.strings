@@ -150,6 +150,8 @@
 "profile.keyboard.text" = "Hold ⌥ Space. The mouse does not open the menu.";
 "profile.mouse" = "Mouse only";
 "profile.mouse.text" = "Hold the middle button, no key. No keyboard shortcut.";
+"settings.animations" = "Interface animations";
+"settings.animations.hint" = "Ring opening, Open apps magnifier, Controller icon tilt, spinning cover art. Also off when macOS reduces motion.";
 "settings.atpointer" = "Open under the pointer";
 "settings.automation" = "Permission";
 "settings.automation.open" = "Open Mac settings";

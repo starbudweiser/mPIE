@@ -45,6 +45,12 @@ final class PieModel: ObservableObject {
     @Published var now: NowPlaying?
     @Published var cover: NSImage?
     @Published var accessibilityMissing = false
+    // Animations (réglage « Animations de l'interface », coupées aussi si macOS demande de réduire les animations)
+    @Published var animated = true
+    @Published var appeared = true         // ouverture : le cercle grandit et apparaît
+    @Published var focus: Double = 0       // Sélecteur : indice visé « déroulé » (animé d'une part à l'autre)
+    @Published var magnify: Double = 0     // Sélecteur : 0 cercle régulier, 1 loupe complète
+    @Published var tilt: CGSize = .zero    // Contrôleur : écart du pointeur au centre, de -1 à 1 (y vers le haut)
     var onSelectModule: ((PieModule) -> Void)?
 
     var hoveredItem: PieItem? {

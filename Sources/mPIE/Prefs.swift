@@ -29,6 +29,7 @@ final class Prefs: ObservableObject {
     @Published var openAtPointer: Bool { didSet { d.set(openAtPointer, forKey: "openAtPointer"); changed() } }
     @Published var showName: Bool { didSet { d.set(showName, forKey: "showName"); changed() } }
     @Published var sound: Bool { didSet { d.set(sound, forKey: "sound"); changed() } }
+    @Published var animations: Bool { didSet { d.set(animations, forKey: "animations"); changed() } }
     @Published var excludedApps: [String] { didSet { d.set(excludedApps, forKey: "excludedApps"); changed() } }
     @Published var musicPlayer: MusicPlayer { didSet { d.set(musicPlayer.rawValue, forKey: "musicPlayer"); changed() } }
     @Published var menuBarIcon: Bool { didSet { d.set(menuBarIcon, forKey: "menuBarIcon"); changed() } }
@@ -55,6 +56,7 @@ final class Prefs: ObservableObject {
         openAtPointer = bool("openAtPointer", true)
         showName = bool("showName", true)
         sound = bool("sound", false)
+        animations = bool("animations", true)
         excludedApps = d.stringArray(forKey: "excludedApps") ?? []
         musicPlayer = MusicPlayer(rawValue: d.string(forKey: "musicPlayer") ?? "") ?? .auto
         menuBarIcon = bool("menuBarIcon", true)
@@ -66,6 +68,9 @@ final class Prefs: ObservableObject {
         let list = PieModule.allCases.filter { !disabledModules.contains($0.rawValue) }
         return list.isEmpty ? [.launcher] : list
     }
+
+    /// Animations actives : le réglage ET le réglage macOS « Réduire les animations ».
+    var animationsActive: Bool { animations && !NSWorkspace.shared.accessibilityDisplayShouldReduceMotion }
 
     func isEnabled(_ module: PieModule) -> Bool { !disabledModules.contains(module.rawValue) }
 

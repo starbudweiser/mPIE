@@ -139,6 +139,8 @@ struct SettingsView: View {
                 toggle("settings.atpointer", $prefs.openAtPointer)
                 toggle("settings.showname", $prefs.showName)
                 toggle("settings.sound", $prefs.sound)
+                toggle("settings.animations", $prefs.animations)
+                hint("settings.animations.hint")
             }
             block("settings.modulekeys") {
                 ForEach([HotkeyAction.launcher, .switcher, .controller, .music], id: \.self) { action in

@@ -150,6 +150,8 @@
 "profile.keyboard.text" = "⌥ Espace maintenu. La souris n'ouvre pas le menu.";
 "profile.mouse" = "Souris seule";
 "profile.mouse.text" = "Bouton du milieu maintenu, sans touche. Aucun raccourci clavier.";
+"settings.animations" = "Animations de l'interface";
+"settings.animations.hint" = "Ouverture du cercle, loupe du Sélecteur, inclinaison de l'icône du Contrôleur, pochette qui tourne. Coupées aussi si macOS réduit les animations.";
 "settings.atpointer" = "Ouvrir sous le pointeur";
 "settings.automation" = "Autorisation";
 "settings.automation.open" = "Ouvrir les réglages du Mac";

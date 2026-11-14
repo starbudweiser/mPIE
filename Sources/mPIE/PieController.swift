@@ -56,6 +56,8 @@ final class PieController: NSObject {
         model.enabled = enabled
         model.scale = CGFloat(prefs.pieScale)
         model.showName = prefs.showName
+        model.animated = prefs.animationsActive
+        model.appeared = !model.animated
         model.holdStyle = prefs.style == .hold && source != .menu
         model.hover = nil
         target = AppTracker.shared.lastExternal
@@ -75,6 +77,10 @@ final class PieController: NSObject {
         panel.orderFrontRegardless()
         panel.makeKey()
         startTracking()
+        if model.animated {
+            // Ouverture : le cercle grandit depuis son centre en apparaissant (ressort court, sans rebond marqué).
+            DispatchQueue.main.async { withAnimation(.spring(response: 0.22, dampingFraction: 0.82)) { PieController.shared.model.appeared = true } }
+        }
     }
 
     private func startModule() -> PieModule {
@@ -101,6 +107,7 @@ final class PieController: NSObject {
     func select(_ module: PieModule) {
         model.module = module
         model.hover = nil
+        model.focus = 0; model.magnify = 0; model.tilt = .zero
         prefs.lastModule = module
         MusicRemote.shared.stopPolling()
         switch module {
@@ -219,9 +226,49 @@ final class PieController: NSObject {
         let index = PieGeometry.index(dx: Double(pointer.x - center.x), dy: Double(pointer.y - center.y), count: model.items.count,
                                       inner: Double(metrics.inner), outerLimit: Double(metrics.outer + 70))
         if index != model.hover {
+            let before = model.hover
             model.hover = index
+            if model.module == .switcher { followFocus(index, before: before) }
             if index != nil, prefs.sound { NSSound(named: "Tink")?.play() }
         }
+        updateTilt(dx: pointer.x - center.x, dy: pointer.y - center.y, outer: metrics.outer)
+    }
+
+    private static let ringSpring = Animation.spring(response: 0.14, dampingFraction: 0.78)
+
+    /// Sélecteur : la loupe et le surlignage suivent l'appli visée par un ressort court ; sans animations, le surlignage saute
+    /// d'une appli à l'autre et le cercle reste régulier.
+    private func followFocus(_ index: Int?, before: Int?) {
+        let n = model.items.count
+        guard n > 0 else { return }
+        guard let index else {
+            if model.animated { withAnimation(Self.ringSpring) { model.magnify = 0 } } else { model.magnify = 0 }
+            return
+        }
+        guard model.animated else { model.focus = Double(index); model.magnify = 0; return }
+        if before == nil {
+            // Le pointeur entre dans le cercle : le surlignage apparaît sur place, seule la loupe s'installe.
+            var transaction = Transaction(); transaction.disablesAnimations = true
+            withTransaction(transaction) { model.focus = Double(index) }
+            withAnimation(Self.ringSpring) { model.magnify = 1 }
+            return
+        }
+        var current = model.focus.truncatingRemainder(dividingBy: Double(n))
+        if current < 0 { current += Double(n) }
+        var delta = Double(index) - current
+        if delta > Double(n) / 2 { delta -= Double(n) } else if delta < -Double(n) / 2 { delta += Double(n) }
+        withAnimation(Self.ringSpring) { model.focus += delta; model.magnify = 1 }
+    }
+
+    /// Contrôleur : l'icône de l'appli se penche vers le pointeur.
+    private func updateTilt(dx: CGFloat, dy: CGFloat, outer: CGFloat) {
+        guard model.module == .controller, model.animated else {
+            if model.tilt != .zero { model.tilt = .zero }
+            return
+        }
+        let target = CGSize(width: max(-1, min(1, dx / outer)), height: max(-1, min(1, dy / outer)))
+        guard abs(target.width - model.tilt.width) > 0.02 || abs(target.height - model.tilt.height) > 0.02 else { return }
+        withAnimation(.spring(response: 0.12, dampingFraction: 0.75)) { model.tilt = target }
     }
 
     private func local(_ event: NSEvent) -> NSEvent? {
@@ -305,8 +352,18 @@ final class PieController: NSObject {
         activationObserver = nil
         MusicRemote.shared.stopPolling()
         MusicRemote.shared.onUpdate = nil
-        panel?.orderOut(nil)
-        panel = nil
+        if let closing = panel {
+            panel = nil
+            if model.animated {
+                // Fermeture : fondu court, sans bloquer une réouverture immédiate (le panneau suivant est un autre panneau).
+                NSAnimationContext.runAnimationGroup({ context in
+                    context.duration = 0.1
+                    closing.animator().alphaValue = 0
+                }, completionHandler: { closing.orderOut(nil) })
+            } else {
+                closing.orderOut(nil)
+            }
+        }
         model.hover = nil
     }
 }

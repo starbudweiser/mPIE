@@ -2,27 +2,27 @@ import AppKit
 import SwiftUI
 import mPIECore
 
-/// Une part de couronne, centrée sur le haut pour l'indice 0 puis dans le sens horaire.
-struct PieSlice: Shape {
-    let index: Int
-    let count: Int
+/// Part de couronne : angles en degrés, sens horaire depuis le haut. Les deux bords radiaux sont des droites parallèles au
+/// rayon, retirées de `gap / 2` : l'écart entre deux parts voisines a la même largeur partout, du centre au bord.
+struct PieSector: Shape {
+    var start: Double
+    var end: Double
     let inner: CGFloat
     let outer: CGFloat
+    var gap: CGFloat = 0
 
     func path(in rect: CGRect) -> Path {
         let c = CGPoint(x: rect.midX, y: rect.midY)
         var p = Path()
-        if count <= 1 {
+        if end - start >= 359.9 {
             p.addEllipse(in: CGRect(x: c.x - outer, y: c.y - outer, width: 2 * outer, height: 2 * outer))
             p.addEllipse(in: CGRect(x: c.x - inner, y: c.y - inner, width: 2 * inner, height: 2 * inner))
             return p
         }
-        let step = 360.0 / Double(count)
-        let mid = -90.0 + Double(index) * step
-        let gap = 1.4
-        let a0 = Angle.degrees(mid - step / 2 + gap), a1 = Angle.degrees(mid + step / 2 - gap)
-        p.addArc(center: c, radius: outer, startAngle: a0, endAngle: a1, clockwise: false)
-        p.addArc(center: c, radius: inner, startAngle: a1, endAngle: a0, clockwise: true)
+        let dOuter = PieGeometry.edgeInset(radius: Double(outer), gap: Double(gap))
+        let dInner = PieGeometry.edgeInset(radius: Double(inner), gap: Double(gap))
+        p.addArc(center: c, radius: outer, startAngle: .degrees(start - 90 + dOuter), endAngle: .degrees(end - 90 - dOuter), clockwise: false)
+        p.addArc(center: c, radius: inner, startAngle: .degrees(end - 90 - dInner), endAngle: .degrees(start - 90 + dInner), clockwise: true)
         p.closeSubpath()
         return p
     }
@@ -32,13 +32,14 @@ struct PieItemView: View {
     let item: PieItem
     let hovered: Bool
     let m: PieMetrics
+    var scale: CGFloat = 1
 
     private var tint: Color { hovered ? Socle.C.onAccentFill : (item.active ? Socle.C.accentText : Socle.C.text) }
 
     var body: some View {
         ZStack {
             if let image = item.image {
-                Image(nsImage: image).resizable().interpolation(.high).frame(width: m.tile, height: m.tile)
+                Image(nsImage: image).resizable().interpolation(.high).frame(width: m.tile * scale, height: m.tile * scale)
             } else if let symbol = item.symbol {
                 Image(systemName: symbol).font(.system(size: 22 * m.s, weight: .semibold)).foregroundStyle(tint)
             } else {
@@ -54,7 +55,7 @@ struct PieItemView: View {
         }
         .overlay(alignment: .bottom) {
             if item.badge == .running {
-                Circle().fill(hovered ? Socle.C.onAccentFill : Socle.C.success).frame(width: 5, height: 5).offset(y: 10)
+                Circle().fill(hovered ? Socle.C.onAccentFill : Socle.C.success).frame(width: 5, height: 5).offset(y: 10 * scale)
             }
         }
         .overlay(alignment: .topTrailing) {
@@ -67,9 +68,89 @@ struct PieItemView: View {
     }
 }
 
+/// Cercle régulier (Lanceur, Contrôleur, Musique) : une part par élément, écart constant entre les parts, survol immédiat.
+struct PieStaticRing: View {
+    let items: [PieItem]
+    let hover: Int?
+    let m: PieMetrics
+
+    var body: some View {
+        let n = items.count, c = m.side / 2, step = 360.0 / Double(max(n, 1))
+        ZStack {
+            ForEach(0..<n, id: \.self) { i in
+                PieSector(start: (Double(i) - 0.5) * step, end: (Double(i) + 0.5) * step, inner: m.inner, outer: m.outer, gap: 3)
+                    .fill(i == hover ? Socle.C.accentFill : Socle.C.surfaceRaised, style: FillStyle(eoFill: true))
+            }
+            ForEach(0..<n, id: \.self) { i in
+                let a = (Double(i) * step - 90) * .pi / 180
+                PieItemView(item: items[i], hovered: i == hover, m: m)
+                    .position(x: c + m.mid * CGFloat(cos(a)), y: c + m.mid * CGFloat(sin(a)))
+            }
+        }
+        .frame(width: m.side, height: m.side)
+    }
+}
+
+/// Cercle du Sélecteur : couronne continue, surlignage qui glisse d'une appli à l'autre, loupe façon Dock. `focus` et `magnify`
+/// sont animables : SwiftUI redessine le cercle à chaque image du ressort.
+struct PieMagnifiedRing: View, Animatable {
+    var focus: Double
+    var magnify: Double
+    let items: [PieItem]
+    let hover: Int?
+    let m: PieMetrics
+
+    var animatableData: AnimatablePair<Double, Double> {
+        get { AnimatablePair(focus, magnify) }
+        set { focus = newValue.first; magnify = newValue.second }
+    }
+
+    var body: some View {
+        let n = items.count, c = m.side / 2, step = 360.0 / Double(max(n, 1))
+        let layout = PieLayout.make(count: n, focus: focus, magnify: magnify)
+        let count = Double(max(n, 1))
+        let f = (focus.truncatingRemainder(dividingBy: count) + count).truncatingRemainder(dividingBy: count)
+        let wedge = PieLayout.wedgeWidth(count: n, magnify: magnify)
+        ZStack {
+            PieSector(start: 0, end: 360, inner: m.inner, outer: m.outer)
+                .fill(Socle.C.surfaceRaised, style: FillStyle(eoFill: true))
+            if hover != nil, n > 0 {
+                PieSector(start: f * step - wedge / 2, end: f * step + wedge / 2, inner: m.inner, outer: m.outer, gap: 0)
+                    .fill(Socle.C.accentFill)
+            }
+            ForEach(0..<n, id: \.self) { i in
+                let pull = layout.pull[i]
+                let scale = 1 + 0.55 * PieLayout.strength(count: n) * pull
+                let a = (layout.centers[i] - 90) * .pi / 180
+                let radius = m.mid + 9 * m.s * pull
+                PieItemView(item: items[i], hovered: false, m: m, scale: CGFloat(scale))
+                    .position(x: c + radius * CGFloat(cos(a)), y: c + radius * CGFloat(sin(a)))
+                    .zIndex(pull)
+            }
+        }
+        .frame(width: m.side, height: m.side)
+    }
+}
+
+/// Pochette qui tourne comme un disque (33 tours/min) tant que la lecture est en cours, et ralentit à l'arrêt.
+final class SpinState {
+    var angle = 0.0
+    var speed = 0.0
+    var last: Date?
+
+    func step(_ date: Date, playing: Bool) -> Double {
+        let dt = min(0.1, last.map { date.timeIntervalSince($0) } ?? 0)
+        last = date
+        speed += ((playing ? 200.0 : 0) - speed) * min(1, dt * 5)
+        angle = (angle + speed * dt).truncatingRemainder(dividingBy: 360)
+        return angle
+    }
+}
+
 struct PieCenter: View {
     @ObservedObject var model: PieModel
     let m: PieMetrics
+    @State private var spin = SpinState()
 
     var body: some View {
         let live = model.module == .launcher || model.module == .switcher
@@ -83,7 +164,7 @@ struct PieCenter: View {
             } else {
                 VStack(spacing: 3) {
                     if hovered == nil, let image = model.centerImage {
-                        Image(nsImage: image).resizable().interpolation(.high).frame(width: 36 * m.s, height: 36 * m.s)
+                        icon(image)
                     }
                     Text(hovered?.title ?? model.centerTitle).socle(Socle.T.title).foregroundStyle(Socle.C.textStrong)
                         .lineLimit(2).multilineTextAlignment(.center).minimumScaleFactor(0.85)
@@ -96,13 +177,30 @@ struct PieCenter: View {
         }
     }
 
+    /// Icône de l'appli visée par le Contrôleur : elle se penche vers le pointeur.
+    @ViewBuilder private func icon(_ image: NSImage) -> some View {
+        let tilt = model.module == .controller && model.animated ? model.tilt : .zero
+        let vx = Double(tilt.width), vy = -Double(tilt.height)   // y de SwiftUI vers le bas
+        // Inclinaison simulée à plat : l'icône se rétrécit dans le sens du pointeur et se décale légèrement vers lui.
+        Image(nsImage: image).resizable().interpolation(.high).frame(width: 36 * m.s, height: 36 * m.s)
+            .scaleEffect(x: cos(vx * 0.42), y: cos(vy * 0.42))
+            .offset(x: CGFloat(vx) * 3, y: CGFloat(vy) * 3)
+    }
+
     @ViewBuilder private func cover(radius: CGFloat) -> some View {
         let size = 2 * radius - 16
-        if let image = model.cover {
-            Image(nsImage: image).resizable().scaledToFill().frame(width: size, height: size).clipShape(Circle())
-        } else {
-            Circle().fill(Socle.C.control).frame(width: size, height: size)
-                .overlay(Image(systemName: "music.note").font(.system(size: 28 * m.s, weight: .semibold)).foregroundStyle(Socle.C.textMuted))
+        let spinning = model.animated
+        TimelineView(.animation(minimumInterval: 1.0 / 60.0, paused: !spinning)) { timeline in
+            let angle = spinning ? spin.step(timeline.date, playing: model.now?.playing ?? false) : 0
+            Group {
+                if let image = model.cover {
+                    Image(nsImage: image).resizable().scaledToFill().frame(width: size, height: size).clipShape(Circle())
+                        .rotationEffect(.degrees(angle))
+                } else {
+                    Circle().fill(Socle.C.control).frame(width: size, height: size)
+                        .overlay(Image(systemName: "music.note").font(.system(size: 28 * m.s, weight: .semibold)).foregroundStyle(Socle.C.textMuted))
+                }
+            }
         }
         if let item = model.hoveredItem {
             Text(item.title).socle(Socle.T.title).foregroundStyle(Socle.C.textStrong)
@@ -116,18 +214,14 @@ struct PieCanvas: View {
     @ObservedObject var model: PieModel
 
     var body: some View {
-        let m = PieMetrics(s: model.scale), n = model.items.count, c = m.side / 2
+        let m = PieMetrics(s: model.scale)
         ZStack {
             Circle().fill(Socle.C.bgSunken).frame(width: 2 * (m.outer + 3), height: 2 * (m.outer + 3))
             Circle().stroke(Socle.C.borderStrong, lineWidth: 1).frame(width: 2 * (m.outer + 3), height: 2 * (m.outer + 3))
-            ForEach(0..<n, id: \.self) { i in
-                PieSlice(index: i, count: n, inner: m.inner, outer: m.outer)
-                    .fill(i == model.hover ? Socle.C.accentFill : Socle.C.surfaceRaised, style: FillStyle(eoFill: true))
-            }
-            ForEach(0..<n, id: \.self) { i in
-                let a = (-90.0 + Double(i) * 360.0 / Double(n)) * .pi / 180
-                PieItemView(item: model.items[i], hovered: i == model.hover, m: m)
-                    .position(x: c + m.mid * CGFloat(cos(a)), y: c + m.mid * CGFloat(sin(a)))
+            if model.module == .switcher {
+                PieMagnifiedRing(focus: model.focus, magnify: model.magnify, items: model.items, hover: model.hover, m: m)
+            } else {
+                PieStaticRing(items: model.items, hover: model.hover, m: m)
             }
             PieCenter(model: model, m: m)
         }
@@ -140,6 +234,7 @@ struct PieRoot: View {
 
     var body: some View {
         let m = PieMetrics(s: model.scale)
+        let height = m.panelHeight(music: model.module == .music)
         VStack(spacing: 8) {
             PieCanvas(model: model).allowsHitTesting(false)
             VStack(spacing: Socle.M.space2) {
@@ -153,7 +248,10 @@ struct PieRoot: View {
             .background(Socle.C.surfaceRaised, in: RoundedRectangle(cornerRadius: Socle.M.radiusLg))
             .overlay(RoundedRectangle(cornerRadius: Socle.M.radiusLg).stroke(Socle.C.border, lineWidth: 1))
         }
-        .frame(width: m.panelWidth, height: m.panelHeight(music: model.module == .music), alignment: .top)
+        .frame(width: m.panelWidth, height: height, alignment: .top)
+        // Ouverture : le cercle grandit depuis son centre en apparaissant.
+        .scaleEffect(model.appeared ? 1 : 0.9, anchor: UnitPoint(x: 0.5, y: (m.side / 2) / height))
+        .opacity(model.appeared ? 1 : 0)
     }
 
     private var modeBar: some View {

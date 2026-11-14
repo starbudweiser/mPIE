@@ -150,6 +150,8 @@
 "profile.keyboard.text" = "Mantén ⌥ Espacio. El ratón no abre el menú.";
 "profile.mouse" = "Solo ratón";
 "profile.mouse.text" = "Mantén el botón central, sin tecla. Sin atajo de teclado.";
+"settings.animations" = "Animaciones de la interfaz";
+"settings.animations.hint" = "Apertura del círculo, lupa de Apps abiertas, inclinación del icono del controlador, carátula que gira. También se desactivan si macOS reduce el movimiento.";
 "settings.atpointer" = "Abrir bajo el puntero";
 "settings.automation" = "Permiso";
 "settings.automation.open" = "Abrir los ajustes del Mac";

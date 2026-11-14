@@ -150,6 +150,8 @@
 "profile.keyboard.text" = "Tieni ⌥ Spazio. Il mouse non apre il menu.";
 "profile.mouse" = "Solo mouse";
 "profile.mouse.text" = "Tieni il pulsante centrale, senza tasto. Nessuna scorciatoia da tastiera.";
+"settings.animations" = "Animazioni dell'interfaccia";
+"settings.animations.hint" = "Apertura del cerchio, lente delle App aperte, inclinazione dell'icona del controller, copertina che gira. Disattivate anche se macOS riduce i movimenti.";
 "settings.atpointer" = "Apri sotto il puntatore";
 "settings.automation" = "Autorizzazione";
 "settings.automation.open" = "Apri le impostazioni del Mac";
