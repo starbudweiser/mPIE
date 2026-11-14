@@ -82,7 +82,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func mouseDown(_ button: Int, _ flags: UInt) {
-        guard let wanted = prefs.mouseButton.buttonNumber, button == wanted else { return }
+        guard prefs.mouseButtonNumber >= 0, button == prefs.mouseButtonNumber else { return }
         let mask = prefs.mouseModifier.mask
         if mask != 0, flags & mask != mask { return }
         if pie.isOpen { pie.close(); return }
@@ -90,7 +90,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     private func mouseUp(_ button: Int) {
-        guard let wanted = prefs.mouseButton.buttonNumber, button == wanted else { return }
+        guard prefs.mouseButtonNumber >= 0, button == prefs.mouseButtonNumber else { return }
         pie.release(from: .mouse)
     }
 

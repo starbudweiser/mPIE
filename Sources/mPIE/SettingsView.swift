@@ -24,6 +24,7 @@ struct SettingsView: View {
     @State private var notice: String?
     @State private var selectedSet = ControlDefaults.genericID
     @State private var trusted = KeySender.trusted
+    @ObservedObject private var probe = MouseProbe.shared
 
     struct RunningEntry: Identifiable { let id: String; let name: String; let icon: NSImage? }
 
@@ -110,12 +111,21 @@ struct SettingsView: View {
             }
             block("settings.mouse") {
                 row("settings.mouse.button") {
-                    Picker("", selection: $prefs.mouseButton) { ForEach(MouseButtonChoice.allCases, id: \.self) { Text(L("mouse." + $0.rawValue)).tag($0) } }
-                        .labelsHidden().frame(width: 190)
+                    HStack(spacing: Socle.M.space2) {
+                        Picker("", selection: $prefs.mouseButtonNumber) {
+                            ForEach(Array(Set([-1, 2, prefs.mouseButtonNumber])).sorted(), id: \.self) { Text(MouseProbe.label($0)).tag($0) }
+                        }
+                        .labelsHidden().frame(width: 170)
+                        Button(probe.detecting ? L("settings.mouse.cancel") : L("settings.mouse.detect")) {
+                            if probe.detecting { probe.cancel() } else { probe.startDetection { prefs.mouseButtonNumber = $0 } }
+                        }
+                        .buttonStyle(SocleButtonStyle(.secondary, height: Socle.M.sizeControl)).fixedSize()
+                    }
                 }
+                mouseStatus
                 row("settings.mouse.modifier") {
                     Picker("", selection: $prefs.mouseModifier) { ForEach(ModifierChoice.allCases, id: \.self) { Text(L("modifier." + $0.rawValue)).tag($0) } }
-                        .labelsHidden().frame(width: 190).disabled(prefs.mouseButton == .off)
+                        .labelsHidden().frame(width: 190).disabled(prefs.mouseButtonNumber < 0)
                 }
                 hint("settings.mouse.hint")
             }
@@ -148,6 +158,22 @@ struct SettingsView: View {
                 }
                 hint("settings.modulekeys.hint")
             }
+        }
+    }
+
+    /// Détection en cours, échec (bouton capté par le logiciel de la souris) ou dernier bouton reçu : le testeur en direct.
+    @ViewBuilder private var mouseStatus: some View {
+        if probe.detecting {
+            Text(L("settings.mouse.detecting")).socle(Socle.T.body).foregroundStyle(Socle.C.accentText)
+        } else if probe.timedOut {
+            Text(L("settings.mouse.none")).socle(Socle.T.meta).foregroundStyle(Socle.C.warning).fixedSize(horizontal: false, vertical: true)
+        } else if let detected = probe.detected {
+            Text(L("settings.mouse.detected", MouseProbe.label(detected))).socle(Socle.T.meta).foregroundStyle(Socle.C.success)
+        } else if let last = probe.last {
+            Text(L("settings.mouse.last", MouseProbe.label(last), L(probe.lastDown ? "mouse.pressed" : "mouse.released")))
+                .socle(Socle.T.meta).foregroundStyle(Socle.C.textMuted)
+        } else {
+            Text(L("settings.mouse.tester")).socle(Socle.T.meta).foregroundStyle(Socle.C.textMuted).fixedSize(horizontal: false, vertical: true)
         }
     }
 

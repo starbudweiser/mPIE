@@ -20,7 +20,8 @@ final class Prefs: ObservableObject {
     private func changed() { NotificationCenter.default.post(name: .prefsChanged, object: nil) }
 
     @Published var style: TriggerStyle { didSet { d.set(style.rawValue, forKey: "style"); changed() } }
-    @Published var mouseButton: MouseButtonChoice { didSet { d.set(mouseButton.rawValue, forKey: "mouseButton"); changed() } }
+    /// Numéro d'`NSEvent` du bouton qui ouvre le menu (2 = milieu, 3 et plus = boutons supplémentaires), -1 = désactivé.
+    @Published var mouseButtonNumber: Int { didSet { d.set(mouseButtonNumber, forKey: "mouseButtonNumber"); changed() } }
     @Published var mouseModifier: ModifierChoice { didSet { d.set(mouseModifier.rawValue, forKey: "mouseModifier"); changed() } }
     @Published var hotkeys: [String: Hotkey] { didSet { d.set(try? JSONEncoder().encode(hotkeys), forKey: "hotkeys"); changed() } }
     @Published var disabledModules: [String] { didSet { d.set(disabledModules, forKey: "disabledModules"); changed() } }
@@ -47,7 +48,9 @@ final class Prefs: ObservableObject {
         func bool(_ k: String, _ v: Bool) -> Bool { UserDefaults.standard.object(forKey: k) as? Bool ?? v }
         let d = UserDefaults.standard
         style = TriggerStyle(rawValue: d.string(forKey: "style") ?? "") ?? .hold
-        mouseButton = MouseButtonChoice(rawValue: d.string(forKey: "mouseButton") ?? "") ?? .middle
+        // Ancien réglage (milieu, bouton 4, bouton 5, désactivé) repris tel quel.
+        mouseButtonNumber = d.object(forKey: "mouseButtonNumber") as? Int
+            ?? (MouseButtonChoice(rawValue: d.string(forKey: "mouseButton") ?? "") ?? .middle).buttonNumber ?? -1
         mouseModifier = ModifierChoice(rawValue: d.string(forKey: "mouseModifier") ?? "") ?? .option
         hotkeys = (d.data(forKey: "hotkeys").flatMap { try? JSONDecoder().decode([String: Hotkey].self, from: $0) }) ?? [:]
         disabledModules = d.stringArray(forKey: "disabledModules") ?? []
@@ -94,7 +97,7 @@ final class Prefs: ObservableObject {
     /// Applique un profil de déclenchement (style, souris et raccourci d'ouverture).
     func apply(_ profile: TriggerProfile) {
         style = profile.style
-        mouseButton = profile.mouseButton
+        mouseButtonNumber = profile.mouseButton.buttonNumber ?? -1
         mouseModifier = profile.mouseModifier
         if profile.keyboard { resetHotkey(.open) } else { setHotkey(.open, nil) }
     }
@@ -102,7 +105,7 @@ final class Prefs: ObservableObject {
     /// Profil dont les réglages correspondent à ceux d'aujourd'hui, s'il y en a un.
     var currentProfile: TriggerProfile? {
         TriggerProfiles.all.first {
-            $0.style == style && $0.mouseButton == mouseButton && $0.mouseModifier == mouseModifier
+            $0.style == style && ($0.mouseButton.buttonNumber ?? -1) == mouseButtonNumber && $0.mouseModifier == mouseModifier
                 && $0.keyboard == (hotkey(.open) != nil)
         }
     }

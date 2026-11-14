@@ -86,7 +86,58 @@ final class MouseTrigger {
     private func handle(_ event: NSEvent) {
         let button = event.buttonNumber, flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask).rawValue
         let down = event.type == .otherMouseDown
-        MainActor.assumeIsolated { if down { onDown?(button, flags) } else { onUp?(button) } }
+        MainActor.assumeIsolated {
+            if MouseProbe.shared.record(button, down: down) { return }   // capté par la détection des réglages
+            if down { onDown?(button, flags) } else { onUp?(button) }
+        }
+    }
+}
+
+/// Testeur et détection des boutons de souris (réglages) : dernier bouton reçu, et capture du prochain appui.
+/// Un bouton capté par le logiciel de la souris (Logi Options+…) n'arrive jamais ici : la détection le signale après 10 s.
+@MainActor
+final class MouseProbe: ObservableObject {
+    static let shared = MouseProbe()
+    @Published private(set) var last: Int?
+    @Published private(set) var lastDown = false
+    @Published private(set) var detecting = false
+    @Published private(set) var timedOut = false
+    @Published private(set) var detected: Int?
+    private var onDetected: ((Int) -> Void)?
+    private var timeout: DispatchWorkItem?
+
+    /// Rend vrai si l'événement est consommé par une détection en cours (le menu ne s'ouvre pas).
+    func record(_ button: Int, down: Bool) -> Bool {
+        last = button; lastDown = down
+        guard detecting else { return false }
+        if down {
+            detecting = false; detected = button
+            timeout?.cancel()
+            onDetected?(button); onDetected = nil
+        }
+        return true
+    }
+
+    func startDetection(_ done: @escaping (Int) -> Void) {
+        timeout?.cancel()
+        detecting = true; timedOut = false; detected = nil; onDetected = done
+        let work = DispatchWorkItem { [weak self] in
+            MainActor.assumeIsolated {
+                guard let self, self.detecting else { return }
+                self.detecting = false; self.timedOut = true; self.onDetected = nil
+            }
+        }
+        timeout = work
+        DispatchQueue.main.asyncAfter(deadline: .now() + 10, execute: work)
+    }
+
+    func cancel() { timeout?.cancel(); detecting = false; onDetected = nil }
+
+    /// Nom d'un bouton : numéro d'`NSEvent` + 1 (le milieu est le bouton 3), -1 = désactivé.
+    static func label(_ number: Int) -> String {
+        if number < 0 { return L("mouse.off") }
+        if number == 2 { return L("mouse.middle") }
+        return L("mouse.button.n", number + 1)
     }
 }
 
