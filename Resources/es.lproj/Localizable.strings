@@ -84,10 +84,17 @@
 "launcher.hint" = "Arrastra apps, carpetas o archivos aquí. El orden sigue el círculo, en sentido horario desde arriba.";
 "launcher.later" = "Después en el círculo";
 "launcher.remove" = "Quitar del lanzador";
+"menu.close" = "Cerrar";
+"menu.copy" = "Copiar";
+"menu.cut" = "Cortar";
+"menu.edit" = "Edición";
 "menu.module" = "Módulo";
 "menu.open" = "Abrir el menú circular";
+"menu.paste" = "Pegar";
 "menu.quit" = "Salir de mPIE";
+"menu.selectAll" = "Seleccionar todo";
 "menu.settings" = "Ajustes…";
+"menu.window" = "Ventana";
 "modifier.command" = "⌘ Comando";
 "modifier.control" = "⌃ Control";
 "modifier.none" = "Ninguna";

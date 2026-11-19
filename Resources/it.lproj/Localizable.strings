@@ -84,10 +84,17 @@
 "launcher.hint" = "Trascina qui app, cartelle o file. L'ordine segue il cerchio, in senso orario dall'alto.";
 "launcher.later" = "Dopo nel cerchio";
 "launcher.remove" = "Rimuovi dal launcher";
+"menu.close" = "Chiudi";
+"menu.copy" = "Copia";
+"menu.cut" = "Taglia";
+"menu.edit" = "Modifica";
 "menu.module" = "Modulo";
 "menu.open" = "Apri il menu circolare";
+"menu.paste" = "Incolla";
 "menu.quit" = "Esci da mPIE";
+"menu.selectAll" = "Seleziona tutto";
 "menu.settings" = "Impostazioni…";
+"menu.window" = "Finestra";
 "modifier.command" = "⌘ Comando";
 "modifier.control" = "⌃ Controllo";
 "modifier.none" = "Nessuno";

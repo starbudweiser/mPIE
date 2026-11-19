@@ -84,10 +84,17 @@
 "launcher.hint" = "Glissez des applis, dossiers ou fichiers ici. L'ordre suit le cercle, dans le sens horaire depuis le haut.";
 "launcher.later" = "Plus tard dans le cercle";
 "launcher.remove" = "Retirer du lanceur";
+"menu.close" = "Fermer";
+"menu.copy" = "Copier";
+"menu.cut" = "Couper";
+"menu.edit" = "Édition";
 "menu.module" = "Module";
 "menu.open" = "Ouvrir le menu circulaire";
+"menu.paste" = "Coller";
 "menu.quit" = "Quitter mPIE";
+"menu.selectAll" = "Tout sélectionner";
 "menu.settings" = "Réglages…";
+"menu.window" = "Fenêtre";
 "modifier.command" = "⌘ Commande";
 "modifier.control" = "⌃ Contrôle";
 "modifier.none" = "Aucune";

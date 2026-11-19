@@ -84,10 +84,17 @@
 "launcher.hint" = "Drop apps, folders or files here. The order follows the ring, clockwise from the top.";
 "launcher.later" = "Later in the ring";
 "launcher.remove" = "Remove from the launcher";
+"menu.close" = "Close";
+"menu.copy" = "Copy";
+"menu.cut" = "Cut";
+"menu.edit" = "Edit";
 "menu.module" = "Module";
 "menu.open" = "Open the pie menu";
+"menu.paste" = "Paste";
 "menu.quit" = "Quit mPIE";
+"menu.selectAll" = "Select All";
 "menu.settings" = "Settings…";
+"menu.window" = "Window";
 "modifier.command" = "⌘ Command";
 "modifier.control" = "⌃ Control";
 "modifier.none" = "None";

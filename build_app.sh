@@ -66,7 +66,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
     <key>CFBundleLocalizations</key><array><string>fr</string><string>en</string><string>es</string><string>it</string></array>
     <key>LSMinimumSystemVersion</key><string>14.0</string>
     <key>LSUIElement</key><true/>
-    <key>NSAppleEventsUsageDescription</key><string>mPIE pilote Musique ou Spotify depuis le menu circulaire.</string>
+    <key>NSAppleEventsUsageDescription</key><string>mPIE controls Music or Spotify from the pie menu.</string>
     $EXTRA
     <key>NSHumanReadableCopyright</key><string>© 2026 Starbudweiser</string>
 </dict>
