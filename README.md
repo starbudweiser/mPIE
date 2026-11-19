@@ -10,6 +10,8 @@ A personal pie menu for macOS: launch, switch and control your apps and your mus
 - Inspired by [Pieoneer](https://appahead.studio/apps/pieoneer/) by App ahead, with no affiliation with its authors. No asset or code from the original is used.
 - In the app: menu bar icon → **About mPIE**.
 
+![The mPIE ring open on the Launcher module, with an app slice highlighted and the module bar below.](docs/screenshot.png)
+
 ## Modules
 
 - **Launcher**: apps, folders and files (up to 16), ordered clockwise from the top.
