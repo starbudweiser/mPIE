@@ -6,7 +6,7 @@ A personal pie menu for macOS: launch, switch and control your apps and your mus
 
 - **Authors:** Starbudweiser & Claude Code (Anthropic).
 - **License:** MIT. © 2026 Starbudweiser.
-- Provided as is, without warranty.
+- Provided as is, without warranty. Part of the **DESKTOP MAC TOOLKIT**.
 - Inspired by [Pieoneer](https://appahead.studio/apps/pieoneer/) by App ahead, with no affiliation with its authors. No asset or code from the original is used.
 - In the app: menu bar icon → **About mPIE**.
 

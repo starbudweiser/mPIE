@@ -53,6 +53,7 @@ enum About {
             label("Starbudweiser & Claude Code (Anthropic)", bold: true),
             label(L("about.license")),
             label(L("about.disclaimer"), secondary: true),
+            label(L("about.collection"), secondary: true),
             label(L("about.credit"), secondary: true),
         ]
         let stack = NSStackView(views: views)
